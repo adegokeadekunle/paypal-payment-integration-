@@ -13,11 +13,11 @@ import java.util.Map;
 @Configuration
 public class PaypalConfig {
 
-    @Value("$paypal.client.id")
+    @Value("${paypal.client.id}")
     private String clientId;
-    @Value("$paypal.client.secret")
+    @Value("${paypal.client.secret}")
     private String clientSecret;
-    @Value("$paypal.client.mode")
+    @Value("${paypal.client.mode}")
     private String clientMode;
 
     @Bean
@@ -33,8 +33,8 @@ public class PaypalConfig {
     }
     @Bean
     public APIContext apiContext() throws PayPalRESTException {
-        APIContext apiContext = new APIContext(oauthTokenCredential().getAccessToken());
-        apiContext.setConfigurationMap(payPalSDKConfig());
-        return apiContext;
+        APIContext context = new APIContext(oauthTokenCredential().getAccessToken());
+        context.setConfigurationMap(payPalSDKConfig());
+        return context;
     }
 }

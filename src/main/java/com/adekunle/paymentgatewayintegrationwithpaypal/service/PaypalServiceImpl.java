@@ -1,6 +1,5 @@
 package com.adekunle.paymentgatewayintegrationwithpaypal.service;
 
-import com.adekunle.paymentgatewayintegrationwithpaypal.dto.PaypalPaymentDto;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
@@ -20,31 +19,37 @@ public class PaypalServiceImpl implements PaypalService {
     private APIContext apiContext;
 
     @Override
-    public Payment createPayment(PaypalPaymentDto paypalPaymentDto) throws PayPalRESTException {
+    public Payment createPayment(Double total,
+                                 String currency,
+                                 String method,
+                                 String intent,
+                                 String description,
+                                 String cancel_url,
+                                 String success_url) throws PayPalRESTException {
 
         Amount amount = new Amount();
-        amount.setCurrency(paypalPaymentDto.getCurrency());
+        amount.setCurrency(currency);
         // paypalPaymentDto.setTotal(new BigDecimal(paypalPaymentDto.getTotal()).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
-        Double total = paypalPaymentDto.setTotal(BigDecimal.valueOf(paypalPaymentDto.getTotal()).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
+        total = BigDecimal.valueOf(total).setScale(2, RoundingMode.HALF_DOWN).doubleValue();
         amount.setTotal(String.format("%.2f", total));
 
         Transaction transaction = new Transaction();
-        transaction.setDescription(paypalPaymentDto.getDescription());
+        transaction.setDescription(description);
         transaction.setAmount(amount);
 
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
 
         Payer payer = new Payer();
-        payer.setPaymentMethod(paypalPaymentDto.getMethod());
+        payer.setPaymentMethod(method);
 
         Payment payment = new Payment();
-        payment.setIntent(paypalPaymentDto.getIntent());
+        payment.setIntent(intent);
         payment.setPayer(payer);
         payment.setTransactions(transactions);
         RedirectUrls redirectUrls = new RedirectUrls();
-        redirectUrls.setCancelUrl(paypalPaymentDto.getCancelUrl());
-        redirectUrls.setReturnUrl(paypalPaymentDto.getSuccessUrl());
+        redirectUrls.setCancelUrl(cancel_url);
+        redirectUrls.setReturnUrl(success_url);
         payment.setRedirectUrls(redirectUrls);
 
         return payment.create(apiContext);
